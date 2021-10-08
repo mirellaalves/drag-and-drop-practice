@@ -9,7 +9,7 @@ const columns = [
     {
         id: 2,
         title: 'column2',
-        cards: [],
+        cards: shapes,
     }
 ];
 
