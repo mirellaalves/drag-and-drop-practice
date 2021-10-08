@@ -1,18 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import shapes from './dragAndDropData/index';
-import Shape from './components/Shape';
 import './App.css';
 
 const App = () => {
+  const [shapesList, setShapesList] = useState(shapes)
+
+  const handleOnDragEnd = (result) => {
+    console.log(result);
+    if (!result.destination) return;
+    const items = Array.from(shapesList);
+    const [movedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, movedItem);
+
+    setShapesList(items);
+  }
+
   return (
     <div className='App'>
-      <ul className='shapes'>{ shapes.map(({ id, name, img }) => {
-        return (
-          <div className='shape'>
-            {Shape(id, name, img)}
-          </div>
-        )
-      })}</ul>
+      <header>
+        <h1>Shapes</h1>
+      </header>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        <Droppable droppableId='shapes'>
+          {(provided) => (
+            <ul className='shapes' {...provided.droppableProps} ref={provided.innerRef}>
+              { shapesList.map(({ id, name, img }, index) => {
+                return (
+                  <Draggable key={id} draggableId={id} index={index}>
+                    {(provided) => (
+                      <li className='shape' {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                        <img src={img} alt={`${name} shape`} width='20px' />
+                        <span>{name}</span>
+                      </li>
+                    )}
+                  </Draggable>
+                )
+              })}
+              {provided.placeholder}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <footer>
+        <p>@2021</p>
+      </footer>
     </div>
   )
 }
